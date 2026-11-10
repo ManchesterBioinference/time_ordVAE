@@ -1,0 +1,54 @@
+real run:
+    nextflow run dygen_exp_nextflow.nf   -c dyngen_run.config -with-dag dag.svg -with-report -with-trace -bg
+
+dry run:
+    nextflow run dygen_exp_nextflow.nf   -c dyngen_run.config -with-dag dag.svg -preview
+conda env:
+    conda activate nf-env
+clean:
+    nextflow clean
+    nextflow clean -f -but last # Keep most recent
+
+In order to persistently run nextflow:
+    ssh CSF
+    screen -S pipeline_run
+    conda activate nf-env
+    nextflow run furlong_exp_nextflow.nf -c furlong_run_test.config -with-dag dag.svg -with-report -with-trace -bg
+    nextflow run furlong_exp_nextflow.nf -c furlong_run_test.config -with-trace -bg -resume
+
+    nextflow run furlong_exp_nextflow.nf -c furlong_run.config -with-trace -bg -entry analysis_only
+
+    
+    # Check the log to see which processes are running/completed
+    nextflow log
+
+    # (Optional) You can also view the live output in the .nextflow.log file
+    tail -f .nextflow.log
+
+    Press Ctrl+A, then release, and then press D (for Detach).
+
+    ssh CSF
+
+    # List running screen sessions to find the name
+    screen -ls
+
+    # Re-attach to your session by name
+    screen -r pipeline_run
+
+    # To cancel, get the id of the running java process and kill the process
+
+    ps -u $USER | grep java
+
+    if multiple jobs are running use this instead
+
+    ps -u $USER -f | grep "nextflow" | grep -v grep | awk '{for (i=1; i<=NF; i++) if ($i == "run") {s=""; for (j=i; j<=NF; j++) s=s $j " "; print $2, $5, s}}'
+
+    
+    kill 4184985
+
+    screen -XS <session-id> quit
+
+
+
+
+
